@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodology - Student Addiction Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container animate-fade-in">
+        <nav>
+            <div class="nav-brand">🎓 PredictorHub</div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="predictor.html">Predictor</a>
+                <a href="methodology.html" style="color: var(--secondary)">Methodology</a>
+                <a href="wellbeing.html">Wellbeing</a>
+                <span class="nav-divider"></span>
+                <div id="nav-user-container"></div>
+            </div>
+        </nav>
+
+        <div class="glass-panel mt-2" style="max-width: 900px; margin: 2rem auto;">
+            <div class="text-center mb-2">
+                <h1>🔬 Science & Methodology</h1>
+                <p class="text-muted text-lg">How our AI analyzes your digital footprint.</p>
+            </div>
+            <hr class="mb-2" style="border-color: rgba(255,255,255,0.1);">
+            
+            <div style="font-size: 1.1rem; line-height: 1.8;">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">The Machine Learning Pipeline</h3>
+                <p class="mb-2">
+                    Our predictor is powered by a robust **Lasso Regression Pipeline** trained on extensive datasets representing diverse student populations. Rather than using simple thresholds, the model understands complex interactions—for example, how high usage hours combined with elevated conflict frequencies compound into higher risk categories.
+                </p>
+                
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">Data Engineering</h3>
+                <p class="mb-2">
+                    Before making a prediction, the engine naturally clips statistical outliers using the Interquartile Range (IQR) method and transforms skewed variables (like sleep hours) using logarithmic scaling. This ensures that extreme edge cases don't skew the AI's understanding of your daily routine.
+                </p>
+
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">Privacy First</h3>
+                <p>
+                    All personal identifying data remains entirely local. The predictions run completely on your own machine via our localized backend, meaning your mental health metrics are never sent to a cloud database or third-party server.
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

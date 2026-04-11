@@ -33,3 +33,6 @@ class IQRClipper(BaseEstimator, TransformerMixin):
             )
 
         return X_clipped
+
+    def get_feature_names_out(self, input_features=None):
+        return input_features

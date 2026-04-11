@@ -1,89 +1,48 @@
-# 🎓 Student Social Media Addiction Predictor
+# Student Social Media Addiction Predictor
 
-A machine learning–based web application that predicts a student's **social media addiction percentage** based on behavioral, academic, and mental health factors.
+This project evaluates and predicts the severity of social media addiction among students utilizing a custom Machine Learning pipeline (Lasso Regression). It has evolved from a basic data science project into a fully functional, localized full-stack web application powered by **Flask**, **SQLite**, and **Vanilla HTML/CSS/JS** with a stunning glassmorphism interface.
 
-This project demonstrates an end-to-end ML workflow including data preprocessing, feature engineering, dimensionality reduction, regression modeling, and deployment using Streamlit.
+## 📁 Repository Structure
 
----
+The entire codebase is structured strictly by discipline for maximum scalability:
 
-## 🚀 Project Overview
+- **/frontend** - All HTML, CSS, and JS assets used to construct the user interface.
+- **/backend** - The core Flask architecture (`app.py`), defining the web server APIs, alongside `db.py` handling the SQLite database (`database.sqlite`).
+- **/models** - Contains all ML artifacts including the saved Lasso pipeline (`addiction_model.pkl`), custom transformers (`utils.py`), and the core exploratory/training Jupyter Notebooks (`main.ipynb` & `main_pipeline.ipynb`).
+- **/data** - Hosts the raw input datasets (`Students Social Media Addiction.csv`).
+- **/figures** - The designated directory to store generated Data Science charts and statistical plots.
+- **/reports** - Holds generated HTML profiling reports detailing dataset metadata.
+- **requirements.txt** - Contains all essential python packages required to launch the environment.
+- **start.py** - The unified launch script acting as the entry point for the whole application.
+- **README.md** - You are here.
 
-Social media addiction has become a growing concern among students, affecting academic performance, mental health, and daily routines.  
-This project aims to quantify addiction intensity on a continuous scale and present it as an easy-to-understand **percentage score (0–100%)**.
+## 🚀 How to Run the Application
 
-The system:
+You do not need to boot separate frontend and backend environments. Our Flask server seamlessly interfaces with the backend database and statically serves the modern UI.
 
-- Takes user input related to social media usage and lifestyle
-- Processes it through an ML pipeline
-- Outputs an addiction score and percentage
+1. **Install Dependencies**
+   Open your terminal and install the requirements (a dedicated Virtual Environment like conda is highly recommended):
+   ```bash
+   pip install -r requirements.txt
+   ```
 
----
+2. **Launch the Full-Stack Application**
+   Run the master launch script from the root directory:
+   ```bash
+   python start.py
+   ```
 
-## ✨ Features
+3. **Explore the Web App**
+   Open your browser and navigate to:
+   ```text
+   http://127.0.0.1:5000/
+   ```
+   *Note: Because the application uses an isolated internal SQLite database to store user histories, you will need to click **Sign Up** to create an account on your first launch.*
 
-- Outlier Handling using IQR Clipping  
-- Categorical Encoding (One-Hot & Ordinal Encoding)  
-- Feature Transformations (Logarithmic & Square Root)  
-- Dimensionality Reduction using PCA  
-- Lasso Regression Model  
-- End-to-End Pipeline Integration  
-- Streamlit Web Interface  
+## 🧠 Generating Insights
 
----
+The application supports a "Model Insights" tab directly in the UI. For the data to populate, you must first execute the Data Science notebooks or relevant metric scripts to export `.png` plots directly into the `/figures` directory. Once populated, the web app will auto-render them.
 
-## 📊 Model Performance
+## 🔐 Privacy & Security
 
-The regression model achieves:
-
-**R² Score: 0.9597**
-
-This means the model explains approximately **96% of the variance** in the addiction score.
-
----
-
-## 🧠 Output Interpretation
-
-- Model predicts a raw addiction score in range **2 – 9**
-- Raw score is mapped to **0 – 100%**
-
-Formula: 
-percentage = (raw_score - 2) / 7 * 100
-
-Example: 
-Raw Score = 6
-Percentage = (6 - 2) / 7 * 100 ≈ 57%
-
-
----
-
-## ⚙️ Requirements & Dependencies
-
-A `requirements.txt` file is provided as a **best-practice artifact**.
-
-⚠️ Important Notes:
-
-- The file may contain **some unused or extra libraries**
-- It was generated mainly to demonstrate good project practice
-- The project uses **basic and commonly available libraries**
-- The code can run on **most modern versions** of required libraries
-
-You may freely install dependencies manually if preferred.
-
----
-
-## ▶️ Run Locally
-
-### 1️⃣ (Optional) Create Environment
-
-conda create -n ml_env python=3.11
-conda activate ml_env
-
-### 2️⃣ Install Dependencies
-
-pip install -r requirements.txt
-
-### 3️⃣ Run Web App
-
-cd codes
-streamlit run app.py
-
+All inputs, hashes, and behavioral calculations are handled **strictly locally**. At no point does the application ping external cloud servers. Your generated `database.sqlite` and behavioral histories belong securely to your local machine.

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Student Addiction Predictor</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem 2rem;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth-toggle a {
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="glass-panel auth-card animate-fade-in">
+            <div class="auth-header">
+                <div class="auth-icon">🎓</div>
+                <h1>Welcome</h1>
+                <p style="color: var(--secondary)">Student Social Media Addiction Analyzer</p>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signInForm">
+                <div class="form-group">
+                    <label for="signinEmail">Email</label>
+                    <input type="email" id="signinEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signinPassword">Password</label>
+                    <input type="password" id="signinPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-block" style="margin-top: 1rem;">Sign In</button>
+                <div class="auth-toggle">
+                    Don't have an account? <a id="showSignUp">Sign Up</a>
+                </div>
+            </form>
+
+            <!-- Sign Up Form (Hidden by default) -->
+            <form id="signUpForm" class="hidden">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Gender 🧑/👩</label>
+                    <select id="signupGender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required minlength="6" placeholder="Create a password (min 6 chars)">
+                </div>
+                <button type="submit" class="btn btn-block" style="margin-top: 1rem;">Create Account</button>
+                <div class="auth-toggle">
+                    Already have an account? <a id="showSignIn">Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Form Toggle Logic
+        const signInForm = document.getElementById('signInForm');
+        const signUpForm = document.getElementById('signUpForm');
+        const showSignUpBtn = document.getElementById('showSignUp');
+        const showSignInBtn = document.getElementById('showSignIn');
+
+        showSignUpBtn.addEventListener('click', () => {
+            signInForm.classList.add('hidden');
+            signUpForm.classList.remove('hidden');
+            document.querySelector('.auth-header h1').innerText = 'Create Account';
+        });
+
+        showSignInBtn.addEventListener('click', () => {
+            signUpForm.classList.add('hidden');
+            signInForm.classList.remove('hidden');
+            document.querySelector('.auth-header h1').innerText = 'Welcome';
+        });
+
+        // Sign In Logic
+        signInForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+            
+            const result = await loginUser(email, password);
+            if (result.success) {
+                showToast('Login successful!');
+                window.location.href = 'dashboard.html';
+            } else {
+                showToast(result.message, 'error');
+            }
+        });
+
+        // Sign Up Logic
+        signUpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const gender = document.getElementById('signupGender').value;
+            
+            const result = await registerUser(name, email, password, gender);
+            if (result.success) {
+                showToast('Registration successful! Launching dashboard...');
+                setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            } else {
+                showToast(result.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
