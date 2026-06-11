@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindTrace | Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="app-body" data-page="predictor">
+  <div class="app-bg-grid"></div>
+  <header class="topbar">
+    <a class="brand" href="./predictor.html">
+      <span class="brand-mark">M</span>
+      <div>
+        <strong>MindTrace</strong>
+        <small>Addiction Risk Predictor</small>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="./predictor.html" data-nav="predictor">Predictor</a>
+      <a href="./dashboard.html" data-nav="dashboard">Dashboard</a>
+    </nav>
+
+    <div class="profile-menu">
+      <button class="profile-trigger" type="button" aria-expanded="false">
+        <span class="avatar">MT</span>
+        <span class="profile-copy">
+          <strong id="profile-name">Guest User</strong>
+          <small>Workspace</small>
+        </span>
+        <span class="arrow">&#9662;</span>
+      </button>
+
+      <div class="profile-dropdown">
+        <button class="dropdown-item" type="button" data-action="notice">Accuracy Notice</button>
+        <button class="dropdown-item" type="button" data-action="logout">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <span class="eyebrow">Live Predictor</span>
+      <h1>Estimate student addiction risk from behavioral indicators.</h1>
+      <p>
+        This frontend is ready to connect to your model API. For now it uses a
+        lightweight demo predictor so we can finish the product flow first.
+      </p>
+    </section>
+
+    <section class="predictor-layout">
+      <form class="glass-card predictor-form" id="predictor-form">
+        <div class="section-title">
+          <h2>Student Details</h2>
+          <p>Fill the same signals used in your modeling workflow.</p>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            <span>Age</span>
+            <input type="number" name="age" min="10" max="60" placeholder="19" required>
+          </label>
+
+          <label>
+            <span>Gender</span>
+            <select name="gender" required>
+              <option value="">Select</option>
+              <option>Female</option>
+              <option>Male</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Academic Level</span>
+            <select name="academicLevel" required>
+              <option value="">Select</option>
+              <option>High School</option>
+              <option>Undergraduate</option>
+              <option>Graduate</option>
+              <option>Postgraduate</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Country</span>
+            <input type="text" name="country" placeholder="India" required>
+          </label>
+
+          <label>
+            <span>Average Daily Usage Hours</span>
+            <input type="number" name="usageHours" min="0" max="24" step="0.1" placeholder="5.2" required>
+          </label>
+
+          <label>
+            <span>Most Used Platform</span>
+            <select name="platform" required>
+              <option value="">Select</option>
+              <option>Instagram</option>
+              <option>Twitter</option>
+              <option>Facebook</option>
+              <option>WhatsApp</option>
+              <option>YouTube</option>
+              <option>TikTok</option>
+              <option>Snapchat</option>
+              <option>LinkedIn</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Affects Academic Performance</span>
+            <select name="academicImpact" required>
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Sleep Hours Per Night</span>
+            <input type="number" name="sleepHours" min="0" max="14" step="0.1" placeholder="6.5" required>
+          </label>
+
+          <label>
+            <span>Mental Health Score</span>
+            <input type="number" name="mentalHealth" min="1" max="10" step="1" placeholder="6" required>
+          </label>
+
+          <label>
+            <span>Relationship Status</span>
+            <select name="relationshipStatus" required>
+              <option value="">Select</option>
+              <option>Single</option>
+              <option>In Relationship</option>
+              <option>Complicated</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Conflicts Over Social Media</span>
+            <input type="number" name="conflicts" min="0" max="10" step="1" placeholder="3" required>
+          </label>
+        </div>
+
+        <button class="primary-btn full-width" type="submit">Predict Risk</button>
+      </form>
+
+      <aside class="results-stack">
+        <article class="glass-card result-card" id="prediction-card">
+          <div class="section-title">
+            <h2>Prediction Result</h2>
+            <p>The response area for your trained model output.</p>
+          </div>
+
+          <div class="score-orb" id="score-orb">--</div>
+          <h3 id="risk-label">Awaiting submission</h3>
+          <p id="risk-summary">
+            Submit the form to generate a score, risk label, and short explanation.
+          </p>
+        </article>
+
+        <article class="glass-card note-card">
+          <h2>Accuracy Notice</h2>
+          <p>
+            This interface should display the model’s confidence and a short disclaimer
+            once the backend is connected, especially if predictions may influence real decisions.
+          </p>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <dialog class="notice-modal" id="notice-modal">
+    <div class="modal-content">
+      <h2>Accuracy Notice</h2>
+      <p>
+        Predictions should be treated as decision support, not a diagnosis. Display your
+        validated model accuracy, training scope, and known limitations when you connect the backend.
+      </p>
+      <button class="primary-btn" type="button" id="close-notice">Close</button>
+    </div>
+  </dialog>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

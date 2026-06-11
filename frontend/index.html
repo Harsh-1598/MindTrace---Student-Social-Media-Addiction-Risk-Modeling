@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindTrace | Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="auth-body">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <main class="auth-shell">
+    <section class="auth-hero">
+      <span class="eyebrow">Student Social Media Addiction Risk Modeling</span>
+      <h1>MindTrace</h1>
+      <p>
+        A clean front door for your prediction platform, designed to help students,
+        researchers, and reviewers explore digital behavior risk with clarity.
+      </p>
+
+      <div class="hero-points">
+        <article class="hero-card">
+          <h2>Predict</h2>
+          <p>Run social media addiction risk estimates from a guided, structured form.</p>
+        </article>
+        <article class="hero-card">
+          <h2>Track</h2>
+          <p>Keep the experience ready for future dashboards, usage history, and user profiles.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-toggle" role="tablist" aria-label="Authentication toggle">
+        <button class="auth-tab active" data-auth-tab="login" type="button">Login</button>
+        <button class="auth-tab" data-auth-tab="signup" type="button">Sign Up</button>
+      </div>
+
+      <form class="auth-form active" id="login-form">
+        <div class="form-heading">
+          <h2>Welcome back</h2>
+          <p>Sign in to open the predictor workspace.</p>
+        </div>
+
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="researcher@example.com" required>
+        </label>
+
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="Enter your password" required>
+        </label>
+
+        <button class="primary-btn" type="submit">Login to Predictor</button>
+      </form>
+
+      <form class="auth-form" id="signup-form">
+        <div class="form-heading">
+          <h2>Create account</h2>
+          <p>Start with a lightweight profile for your hosted project.</p>
+        </div>
+
+        <label>
+          <span>Full Name</span>
+          <input type="text" name="name" placeholder="Your name" required>
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </label>
+
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="Choose a password" required>
+        </label>
+
+        <button class="primary-btn" type="submit">Create Account</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

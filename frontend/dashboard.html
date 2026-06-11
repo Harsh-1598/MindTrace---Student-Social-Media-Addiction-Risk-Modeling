@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindTrace | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="app-body" data-page="dashboard">
+  <div class="app-bg-grid"></div>
+  <header class="topbar">
+    <a class="brand" href="./predictor.html">
+      <span class="brand-mark">M</span>
+      <div>
+        <strong>MindTrace</strong>
+        <small>Addiction Risk Predictor</small>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="./predictor.html" data-nav="predictor">Predictor</a>
+      <a href="./dashboard.html" data-nav="dashboard">Dashboard</a>
+    </nav>
+
+    <div class="profile-menu">
+      <button class="profile-trigger" type="button" aria-expanded="false">
+        <span class="avatar">MT</span>
+        <span class="profile-copy">
+          <strong id="profile-name">Guest User</strong>
+          <small>Workspace</small>
+        </span>
+        <span class="arrow">&#9662;</span>
+      </button>
+
+      <div class="profile-dropdown">
+        <button class="dropdown-item" type="button" data-action="notice">Accuracy Notice</button>
+        <button class="dropdown-item" type="button" data-action="logout">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <span class="eyebrow">Dashboard</span>
+      <h1>Your analytics space is ready for backend data.</h1>
+      <p>
+        This placeholder page keeps the navigation complete and gives us a stable destination
+        for future charts, prediction history, model metrics, and account activity.
+      </p>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="glass-card stat-card">
+        <span class="stat-label">Predictions Today</span>
+        <strong>128</strong>
+        <p>Swap this mock value with live database-backed usage stats later.</p>
+      </article>
+
+      <article class="glass-card stat-card">
+        <span class="stat-label">Average Risk Score</span>
+        <strong>61%</strong>
+        <p>Useful for trend snapshots once you start storing model responses.</p>
+      </article>
+
+      <article class="glass-card stat-card">
+        <span class="stat-label">Model Status</span>
+        <strong>Connected Soon</strong>
+        <p>This card can show deployed model version, uptime, and validation notes.</p>
+      </article>
+    </section>
+  </main>
+
+  <dialog class="notice-modal" id="notice-modal">
+    <div class="modal-content">
+      <h2>Accuracy Notice</h2>
+      <p>
+        Once deployed, this page should surface your model score, confidence language,
+        and any fairness or scope limits that users need before trusting a prediction.
+      </p>
+      <button class="primary-btn" type="button" id="close-notice">Close</button>
+    </div>
+  </dialog>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>
