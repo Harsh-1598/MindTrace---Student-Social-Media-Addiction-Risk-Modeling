@@ -47,8 +47,8 @@
       <span class="eyebrow">Live Predictor</span>
       <h1>Estimate student addiction risk from behavioral indicators.</h1>
       <p>
-        This frontend is ready to connect to your model API. For now it uses a
-        lightweight demo predictor so we can finish the product flow first.
+        This frontend now sends your form data to the FastAPI prediction service
+        and renders the live model response here.
       </p>
     </section>
 
@@ -62,16 +62,15 @@
         <div class="form-grid">
           <label>
             <span>Age</span>
-            <input type="number" name="age" min="10" max="60" placeholder="19" required>
+            <input type="number" name="age" min="11" max="29" placeholder="19" required>
           </label>
 
           <label>
             <span>Gender</span>
             <select name="gender" required>
               <option value="">Select</option>
-              <option>Female</option>
               <option>Male</option>
-              <option>Other</option>
+              <option>Female</option>
             </select>
           </label>
 
@@ -82,7 +81,6 @@
               <option>High School</option>
               <option>Undergraduate</option>
               <option>Graduate</option>
-              <option>Postgraduate</option>
             </select>
           </label>
 
@@ -93,7 +91,7 @@
 
           <label>
             <span>Average Daily Usage Hours</span>
-            <input type="number" name="usageHours" min="0" max="24" step="0.1" placeholder="5.2" required>
+            <input type="number" name="usageHours" min="0.1" max="9.9" step="0.1" placeholder="5.2" required>
           </label>
 
           <label>
@@ -108,7 +106,10 @@
               <option>TikTok</option>
               <option>Snapchat</option>
               <option>LinkedIn</option>
-              <option>Other</option>
+              <option>LINE</option>
+              <option>KakaoTalk</option>
+              <option>VKontakte</option>
+              <option>WeChat</option>
             </select>
           </label>
 
@@ -123,12 +124,12 @@
 
           <label>
             <span>Sleep Hours Per Night</span>
-            <input type="number" name="sleepHours" min="0" max="14" step="0.1" placeholder="6.5" required>
+            <input type="number" name="sleepHours" min="3.1" max="9.9" step="0.1" placeholder="6.5" required>
           </label>
 
           <label>
             <span>Mental Health Score</span>
-            <input type="number" name="mentalHealth" min="1" max="10" step="1" placeholder="6" required>
+            <input type="number" name="mentalHealth" min="4.1" max="8.9" step="0.1" placeholder="6.2" required>
           </label>
 
           <label>
@@ -143,8 +144,17 @@
 
           <label>
             <span>Conflicts Over Social Media</span>
-            <input type="number" name="conflicts" min="0" max="10" step="1" placeholder="3" required>
+            <input type="number" name="conflicts" min="1" max="4" step="1" placeholder="3" required>
           </label>
+        </div>
+
+        <p class="helper-copy">
+          <code>Country</code> is still shown for the same UI flow, but the current FastAPI model
+          schema does not use it in the prediction payload yet.
+        </p>
+
+        <div class="status-banner status-neutral" id="predictor-status" aria-live="polite">
+          Fill the form and send it to the API when you're ready.
         </div>
 
         <button class="primary-btn full-width" type="submit">Predict Risk</button>
@@ -162,6 +172,17 @@
           <p id="risk-summary">
             Submit the form to generate a score, risk label, and short explanation.
           </p>
+
+          <div class="result-meta">
+            <div>
+              <span>Source</span>
+              <strong id="prediction-source">FastAPI not called yet</strong>
+            </div>
+            <div>
+              <span>Model Version</span>
+              <strong id="prediction-model">--</strong>
+            </div>
+          </div>
         </article>
 
         <article class="glass-card note-card">
@@ -186,6 +207,7 @@
     </div>
   </dialog>
 
+  <script src="./js/api.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

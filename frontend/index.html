@@ -40,6 +40,10 @@
         <button class="auth-tab" data-auth-tab="signup" type="button">Sign Up</button>
       </div>
 
+      <div class="status-banner status-neutral" id="auth-api-status" aria-live="polite">
+        Checking FastAPI connection...
+      </div>
+
       <form class="auth-form active" id="login-form">
         <div class="form-heading">
           <h2>Welcome back</h2>
@@ -85,6 +89,7 @@
     </section>
   </main>
 
+  <script src="./js/api.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

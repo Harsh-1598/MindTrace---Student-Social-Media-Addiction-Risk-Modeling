@@ -47,28 +47,28 @@
       <span class="eyebrow">Dashboard</span>
       <h1>Your analytics space is ready for backend data.</h1>
       <p>
-        This placeholder page keeps the navigation complete and gives us a stable destination
-        for future charts, prediction history, model metrics, and account activity.
+        This page now mixes live FastAPI health data with browser-stored prediction
+        history so the dashboard feels connected without changing the layout.
       </p>
     </section>
 
     <section class="dashboard-grid">
       <article class="glass-card stat-card">
         <span class="stat-label">Predictions Today</span>
-        <strong>128</strong>
-        <p>Swap this mock value with live database-backed usage stats later.</p>
+        <strong id="predictions-today-value">--</strong>
+        <p id="predictions-today-copy">Loading prediction activity from local history.</p>
       </article>
 
       <article class="glass-card stat-card">
         <span class="stat-label">Average Risk Score</span>
-        <strong>61%</strong>
-        <p>Useful for trend snapshots once you start storing model responses.</p>
+        <strong id="average-risk-value">--</strong>
+        <p id="average-risk-copy">Calculating from saved predictor responses.</p>
       </article>
 
       <article class="glass-card stat-card">
         <span class="stat-label">Model Status</span>
-        <strong>Connected Soon</strong>
-        <p>This card can show deployed model version, uptime, and validation notes.</p>
+        <strong id="model-status-value">Checking...</strong>
+        <p id="model-status-copy">Checking the FastAPI health endpoints.</p>
       </article>
     </section>
   </main>
@@ -84,6 +84,7 @@
     </div>
   </dialog>
 
+  <script src="./js/api.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

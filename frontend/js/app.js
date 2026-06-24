@@ -1,162 +1,423 @@
-const authTabs = document.querySelectorAll("[data-auth-tab]");
-const authForms = {
-  login: document.getElementById("login-form"),
-  signup: document.getElementById("signup-form"),
-};
+(() => {
+  const STORAGE_KEYS = {
+    session: "mindtraceUser",
+    predictionHistory: "mindtracePredictionHistory",
+  };
 
-const fakePredictRisk = (formData) => {
-  const usage = Number(formData.get("usageHours")) || 0;
-  const sleep = Number(formData.get("sleepHours")) || 0;
-  const mentalHealth = Number(formData.get("mentalHealth")) || 0;
-  const conflicts = Number(formData.get("conflicts")) || 0;
-  const academicImpact = formData.get("academicImpact") === "Yes" ? 14 : 0;
+  const cssStatusClasses = ["status-neutral", "status-success", "status-error"];
 
-  let score = 28;
-  score += usage * 7.5;
-  score += conflicts * 4.8;
-  score += academicImpact;
-  score += Math.max(0, 7 - sleep) * 6;
-  score += Math.max(0, 6 - mentalHealth) * 5;
-  score = Math.max(1, Math.min(100, Math.round(score)));
+  const getBodyPage = () => document.body.dataset.page || "";
 
-  let label = "Low Risk";
-  let summary = "Current behavior appears relatively balanced based on the submitted indicators.";
+  const query = (selector, scope = document) => scope.querySelector(selector);
+  const queryAll = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
-  if (score >= 70) {
-    label = "High Risk";
-    summary = "The student shows several strong addiction-associated signals and may need closer attention.";
-  } else if (score >= 45) {
-    label = "Moderate Risk";
-    summary = "The student shows mixed indicators that suggest rising dependence and should be monitored.";
-  }
-
-  return { score, label, summary };
-};
-
-const saveSession = (payload) => {
-  localStorage.setItem("mindtraceUser", JSON.stringify(payload));
-};
-
-const getSession = () => {
-  const stored = localStorage.getItem("mindtraceUser");
-  return stored ? JSON.parse(stored) : null;
-};
-
-const clearSession = () => {
-  localStorage.removeItem("mindtraceUser");
-};
-
-const switchAuthTab = (targetTab) => {
-  authTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.authTab === targetTab));
-  Object.entries(authForms).forEach(([key, form]) => {
-    if (form) {
-      form.classList.toggle("active", key === targetTab);
+  const readJsonStorage = (key, fallbackValue) => {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : fallbackValue;
+    } catch (error) {
+      return fallbackValue;
     }
-  });
-};
+  };
 
-authTabs.forEach((tab) => {
-  tab.addEventListener("click", () => switchAuthTab(tab.dataset.authTab));
-});
+  const writeJsonStorage = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
 
-if (authForms.login) {
-  authForms.login.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get("email");
-    const userName = email ? String(email).split("@")[0] : "User";
-    saveSession({ name: userName, email });
-    window.location.href = "./predictor.html";
-  });
-}
+  const getSession = () => readJsonStorage(STORAGE_KEYS.session, null);
 
-if (authForms.signup) {
-  authForms.signup.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    saveSession({
-      name: data.get("name") || "User",
-      email: data.get("email"),
+  const saveSession = (sessionData) => {
+    writeJsonStorage(STORAGE_KEYS.session, sessionData);
+  };
+
+  const clearSession = () => {
+    localStorage.removeItem(STORAGE_KEYS.session);
+  };
+
+  const getPredictionHistory = () =>
+    readJsonStorage(STORAGE_KEYS.predictionHistory, []);
+
+  const savePredictionHistory = (history) => {
+    writeJsonStorage(STORAGE_KEYS.predictionHistory, history);
+  };
+
+  const addPredictionToHistory = (predictionEntry) => {
+    const currentHistory = getPredictionHistory();
+    const updatedHistory = [predictionEntry, ...currentHistory].slice(0, 25);
+    savePredictionHistory(updatedHistory);
+  };
+
+  const redirectTo = (path) => {
+    window.location.href = path;
+  };
+
+  const setText = (element, value) => {
+    if (element) {
+      element.textContent = value;
+    }
+  };
+
+  const setStatusBanner = (element, message, tone = "neutral") => {
+    if (!element) {
+      return;
+    }
+
+    element.textContent = message;
+    element.classList.remove(...cssStatusClasses);
+    element.classList.add(`status-${tone}`);
+  };
+
+  const setButtonState = (button, options) => {
+    if (!button) {
+      return;
+    }
+
+    button.disabled = options.disabled;
+    button.textContent = options.label;
+  };
+
+  const getDisplayNameFromEmail = (email) => {
+    if (!email) {
+      return "User";
+    }
+
+    return String(email).split("@")[0] || "User";
+  };
+
+  const isSameCalendarDay = (dateA, dateB) =>
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate();
+
+  const setActiveNavLink = (pageName) => {
+    query(`[data-nav="${pageName}"]`)?.classList.add("active");
+  };
+
+  const updateProfileNameSlots = (name) => {
+    queryAll("#profile-name").forEach((element) => {
+      element.textContent = name;
     });
-    window.location.href = "./predictor.html";
-  });
-}
+  };
 
-const currentBody = document.body;
-const appPage = currentBody.dataset.page;
+  const initializeAuthTabs = () => {
+    const tabs = queryAll("[data-auth-tab]");
+    const forms = {
+      login: query("#login-form"),
+      signup: query("#signup-form"),
+    };
 
-if (appPage) {
-  const session = getSession();
+    const activateTab = (tabName) => {
+      tabs.forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.authTab === tabName);
+      });
 
-  if (!session) {
-    window.location.href = "./index.html";
-  } else {
-    const nameTargets = document.querySelectorAll("#profile-name");
-    nameTargets.forEach((node) => {
-      node.textContent = session.name || "Guest User";
+      Object.entries(forms).forEach(([name, form]) => {
+        if (form) {
+          form.classList.toggle("active", name === tabName);
+        }
+      });
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => activateTab(tab.dataset.authTab));
     });
-  }
+  };
 
-  document.querySelector(`[data-nav="${appPage}"]`)?.classList.add("active");
+  const initializeAuthForms = () => {
+    const loginForm = query("#login-form");
+    const signupForm = query("#signup-form");
 
-  const profileMenu = document.querySelector(".profile-menu");
-  const profileTrigger = document.querySelector(".profile-trigger");
-  const noticeModal = document.getElementById("notice-modal");
-  const closeNotice = document.getElementById("close-notice");
+    if (loginForm) {
+      loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
 
-  if (profileTrigger && profileMenu) {
-    profileTrigger.addEventListener("click", () => {
-      const isOpen = profileMenu.classList.toggle("open");
-      profileTrigger.setAttribute("aria-expanded", String(isOpen));
+        const formData = new FormData(loginForm);
+        const email = String(formData.get("email") || "");
+
+        saveSession({
+          name: getDisplayNameFromEmail(email),
+          email,
+        });
+
+        redirectTo("./predictor.html");
+      });
+    }
+
+    if (signupForm) {
+      signupForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(signupForm);
+
+        saveSession({
+          name: String(formData.get("name") || "User"),
+          email: String(formData.get("email") || ""),
+        });
+
+        redirectTo("./predictor.html");
+      });
+    }
+  };
+
+  const initializeAuthApiStatus = async () => {
+    const banner = query("#auth-api-status");
+
+    if (!banner) {
+      return;
+    }
+
+    try {
+      const health = await MindTraceAPI.fetchHealth();
+      setStatusBanner(
+        banner,
+        `Backend connected on ${MindTraceAPI.API_BASE_URL} | Model v${health.version}`,
+        "success"
+      );
+    } catch (error) {
+      setStatusBanner(
+        banner,
+        "Backend is not reachable right now. FastAPI pulled a disappearing act.",
+        "error"
+      );
+    }
+  };
+
+  const initializeProtectedLayout = () => {
+    const currentPage = getBodyPage();
+
+    if (!currentPage) {
+      return true;
+    }
+
+    const session = getSession();
+
+    if (!session) {
+      redirectTo("./index.html");
+      return false;
+    }
+
+    updateProfileNameSlots(session.name || "Guest User");
+    setActiveNavLink(currentPage);
+
+    const profileMenu = query(".profile-menu");
+    const profileTrigger = query(".profile-trigger");
+    const noticeModal = query("#notice-modal");
+    const closeNoticeButton = query("#close-notice");
+
+    const closeMenu = () => {
+      profileMenu?.classList.remove("open");
+      profileTrigger?.setAttribute("aria-expanded", "false");
+    };
+
+    profileTrigger?.addEventListener("click", () => {
+      const nowOpen = profileMenu?.classList.toggle("open");
+      profileTrigger.setAttribute("aria-expanded", String(Boolean(nowOpen)));
     });
 
     document.addEventListener("click", (event) => {
-      if (!profileMenu.contains(event.target)) {
-        profileMenu.classList.remove("open");
-        profileTrigger.setAttribute("aria-expanded", "false");
+      if (profileMenu && !profileMenu.contains(event.target)) {
+        closeMenu();
       }
     });
-  }
 
-  document.querySelectorAll("[data-action='notice']").forEach((button) => {
-    button.addEventListener("click", () => {
-      noticeModal?.showModal();
-      profileMenu?.classList.remove("open");
+    queryAll("[data-action='notice']").forEach((button) => {
+      button.addEventListener("click", () => {
+        closeMenu();
+        noticeModal?.showModal();
+      });
     });
-  });
 
-  closeNotice?.addEventListener("click", () => noticeModal?.close());
-
-  document.querySelectorAll("[data-action='logout']").forEach((button) => {
-    button.addEventListener("click", () => {
-      clearSession();
-      window.location.href = "./index.html";
+    closeNoticeButton?.addEventListener("click", () => {
+      noticeModal?.close();
     });
-  });
-}
 
-const predictorForm = document.getElementById("predictor-form");
+    queryAll("[data-action='logout']").forEach((button) => {
+      button.addEventListener("click", () => {
+        clearSession();
+        redirectTo("./index.html");
+      });
+    });
 
-if (predictorForm) {
-  predictorForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const result = fakePredictRisk(formData);
+    return true;
+  };
 
-    const scoreOrb = document.getElementById("score-orb");
-    const riskLabel = document.getElementById("risk-label");
-    const riskSummary = document.getElementById("risk-summary");
+  const renderPredictionResult = (predictionResult, healthInfo) => {
+    setText(query("#score-orb"), `${predictionResult.score}%`);
+    setText(query("#risk-label"), predictionResult.label);
+    setText(query("#risk-summary"), predictionResult.summary);
+    setText(query("#prediction-source"), "Live response from POST /predict");
+    setText(query("#prediction-model"), healthInfo?.version || "Available via /health");
+  };
 
-    if (scoreOrb) {
-      scoreOrb.textContent = `${result.score}%`;
+  const initializePredictorHealthHint = async () => {
+    const sourceNode = query("#prediction-source");
+    const modelNode = query("#prediction-model");
+
+    try {
+      const health = await MindTraceAPI.fetchHealth();
+      setText(sourceNode, "FastAPI ready for prediction requests");
+      setText(modelNode, health.version || "--");
+      return health;
+    } catch (error) {
+      setText(sourceNode, "FastAPI not reachable");
+      setText(modelNode, "--");
+      return null;
+    }
+  };
+
+  const initializePredictorPage = () => {
+    if (getBodyPage() !== "predictor") {
+      return;
     }
 
-    if (riskLabel) {
-      riskLabel.textContent = result.label;
+    const form = query("#predictor-form");
+    const statusBanner = query("#predictor-status");
+    const submitButton = query("button[type='submit']", form);
+
+    if (!form) {
+      return;
     }
 
-    if (riskSummary) {
-      riskSummary.textContent = result.summary;
+    let cachedHealth = null;
+
+    initializePredictorHealthHint().then((health) => {
+      cachedHealth = health;
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+
+      setButtonState(submitButton, {
+        disabled: true,
+        label: "Sending to API...",
+      });
+
+      setStatusBanner(
+        statusBanner,
+        "Sending form data to FastAPI. Tiny internet goblins, please behave.",
+        "neutral"
+      );
+
+      try {
+        const predictionResult = await MindTraceAPI.submitPrediction(formData);
+
+        if (!cachedHealth) {
+          cachedHealth = await MindTraceAPI.fetchHealth().catch(() => null);
+        }
+
+        renderPredictionResult(predictionResult, cachedHealth);
+
+        addPredictionToHistory({
+          createdAt: new Date().toISOString(),
+          score: predictionResult.score,
+          label: predictionResult.label,
+          country: String(formData.get("country") || ""),
+          platform: String(formData.get("platform") || ""),
+        });
+
+        setStatusBanner(
+          statusBanner,
+          `Prediction loaded successfully. Current result: ${predictionResult.label}.`,
+          "success"
+        );
+      } catch (error) {
+        setStatusBanner(
+          statusBanner,
+          `The API said "nah" and returned: ${error.message}`,
+          "error"
+        );
+      } finally {
+        setButtonState(submitButton, {
+          disabled: false,
+          label: "Predict Risk",
+        });
+      }
+    });
+  };
+
+  const renderDashboardHistory = () => {
+    const history = getPredictionHistory();
+    const today = new Date();
+    const todayPredictions = history.filter((entry) => {
+      const entryDate = new Date(entry.createdAt);
+      return !Number.isNaN(entryDate.getTime()) && isSameCalendarDay(entryDate, today);
+    });
+
+    const averageScore = history.length
+      ? Math.round(
+          history.reduce((total, entry) => total + Number(entry.score || 0), 0) / history.length
+        )
+      : 0;
+
+    setText(query("#predictions-today-value"), String(todayPredictions.length));
+    setText(
+      query("#predictions-today-copy"),
+      history.length
+        ? "Calculated from prediction results saved in this browser."
+        : "No saved predictions yet. The dashboard is currently surviving on vibes."
+    );
+
+    setText(query("#average-risk-value"), history.length ? `${averageScore}%` : "--");
+    setText(
+      query("#average-risk-copy"),
+      history.length
+        ? `Average made from ${history.length} stored prediction${history.length === 1 ? "" : "s"}.`
+        : "Run one prediction first and this card will stop looking unemployed."
+    );
+  };
+
+  const renderDashboardHealth = async () => {
+    const statusValue = query("#model-status-value");
+    const statusCopy = query("#model-status-copy");
+
+    try {
+      const health = await MindTraceAPI.fetchHealth();
+
+      setText(
+        statusValue,
+        `${health.model_loaded ? "Online" : "Offline"} | v${health.version}`
+      );
+
+      setText(
+        statusCopy,
+        health.model_loaded
+          ? "FastAPI is responding and the model is loaded."
+          : "FastAPI is awake, but the model is not fully loaded yet."
+      );
+    } catch (error) {
+      setText(statusValue, "Offline");
+      setText(
+        statusCopy,
+        "Could not reach FastAPI. The dashboard knocked and nobody answered."
+      );
     }
-  });
-}
+  };
+
+  const initializeDashboardPage = () => {
+    if (getBodyPage() !== "dashboard") {
+      return;
+    }
+
+    renderDashboardHistory();
+    renderDashboardHealth();
+  };
+
+  const initializeApp = () => {
+    initializeAuthTabs();
+    initializeAuthForms();
+    initializeAuthApiStatus();
+
+    const layoutReady = initializeProtectedLayout();
+
+    if (layoutReady === false) {
+      return;
+    }
+
+    initializePredictorPage();
+    initializeDashboardPage();
+  };
+
+  initializeApp();
+})();

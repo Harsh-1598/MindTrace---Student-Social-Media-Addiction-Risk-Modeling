@@ -5,6 +5,17 @@ from typing import Annotated, Literal
 import joblib
 import pandas as pd
 from sklearn import set_config
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Later restrict this
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 set_config(transform_output="pandas")
 
@@ -13,8 +24,6 @@ with open(
     "rb",
 ) as f:
     model = joblib.load(f)
-
-app = FastAPI()
 
 # Model Version -> generally handles by the MLflow
 Model_Version = "1.0.0"
@@ -103,16 +112,17 @@ def predict_addiction_score(data: Student_info):
     print(student_data)
 
     # Access the fitted pipeline
-    pipeline = model.regressor_
+    # pipeline = model.regressor_
 
-    x1 = pipeline.named_steps["Outliers Treatment"].transform(student_data)
-    print("After Outliers Treatment:", type(x1))
-    if hasattr(x1, "columns"):
-        print(x1.columns)
+    # x1 = pipeline.named_steps["Outliers Treatment"].transform(student_data)
+    # print("After Outliers Treatment:", type(x1))
+    # if hasattr(x1, "columns"):
+    #     print(x1.columns)
 
-    x2 = pipeline.named_steps["Feature Engineering"].transform(x1)
-    print("After Feature Engineering:", type(x2))
+    # x2 = pipeline.named_steps["Feature Engineering"].transform(x1)
+    # print("After Feature Engineering:", type(x2))
 
     prediction = model.predict(student_data)[0]
+    percent = (prediction - 2) / 7 * 100
 
-    return JSONResponse(status_code=200, content={"The prediction is": prediction})
+    return JSONResponse(status_code=200, content={"The prediction is": percent})
