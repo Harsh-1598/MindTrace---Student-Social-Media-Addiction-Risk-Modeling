@@ -1,11 +1,11 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from typing import Annotated, Literal
-import joblib
-import pandas as pd
-from sklearn import set_config
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+
+from config.most_used_platform import get_most_used_platforms
+from model.predict import MODEL_VERSION, model, predict_output
+from schema.prediction_response import PredictionResponse, build_prediction_response
+from schema.user_input import Student_info
+import logging
 
 app = FastAPI()
 
@@ -17,112 +17,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-set_config(transform_output="pandas")
-
-with open(
-    r"C:\Users\kejri\OneDrive\Desktop\MLOps\Learning ML from Basics\Projects\MindTrace\models\addiction_model.pkl",
-    "rb",
-) as f:
-    model = joblib.load(f)
-
-# Model Version -> generally handles by the MLflow
-Model_Version = "1.0.0"
+logger = logging.getLogger(__name__)
 
 
-class Student_info(BaseModel):
-
-    Age: Annotated[int, Field(..., gt=10, lt=30, description="Age of the student")]
-    Gender: Annotated[
-        Literal["Male", "Female"], Field(..., description="Gender of the student")
-    ]
-    Academic_Level: Annotated[
-        Literal["Undergraduate", "Graduate", "High School"],
-        Field(..., description="Academic level of the student"),
-    ]
-    Avg_Daily_Usage_Hours: Annotated[
-        float, Field(..., gt=0, lt=10, description="Students daily mobile usage time")
-    ]
-    Most_Used_Platform: Annotated[
-        Literal[
-            "Instagram",
-            "Twitter",
-            "TikTok",
-            "YouTube",
-            "Facebook",
-            "LinkedIn",
-            "Snapchat",
-            "LINE",
-            "KakaoTalk",
-            "VKontakte",
-            "WhatsApp",
-            "WeChat",
-        ],
-        Field(..., description="Platform student use"),
-    ]
-    Affects_Academic_Performance: Annotated[
-        Literal["Yes", "No"], Field(..., description="Does Academics affected")
-    ]
-    Sleep_Hours_Per_Night: Annotated[
-        float,
-        Field(..., gt=3, lt=10, description="How many hours the student sleeps daily"),
-    ]
-    Mental_Health_Score: Annotated[
-        float, Field(..., gt=4, lt=9, description="Mental health score of the student")
-    ]
-    Relationship_Status: Annotated[
-        Literal["In Relationship", "Single", "Complicated"],
-        Field(..., description="Relationship status of the student"),
-    ]
-    Conflicts_Over_Social_Media: Annotated[
-        int, Field(..., gt=0, lt=5, description="Conflicts happen due to social media")
-    ]
-
-
+# Human readable
 @app.get("/")
 def hello():
     return {"message": "Students Social Media Addiction API"}
 
 
+# Machine readable
 @app.get("/health")
 def health_check():
-    return {"status": "OK", "version": Model_Version, "model_loaded": model is not None}
+    return {"status": "OK", "version": MODEL_VERSION, "model_loaded": model is not None}
 
 
-@app.post("/predict")
+@app.get("/metadata/platforms")
+def get_platform_options():
+    return {"platforms": get_most_used_platforms()}
+
+
+@app.post("/predict", response_model=PredictionResponse)
 def predict_addiction_score(data: Student_info):
 
-    student_data = pd.DataFrame(
-        [
-            {
-                "Age": data.Age,
-                "Gender": data.Gender,
-                "Academic_Level": data.Academic_Level,
-                "Avg_Daily_Usage_Hours": data.Avg_Daily_Usage_Hours,
-                "Most_Used_Platform": data.Most_Used_Platform,
-                "Affects_Academic_Performance": data.Affects_Academic_Performance,
-                "Sleep_Hours_Per_Night": data.Sleep_Hours_Per_Night,
-                "Mental_Health_Score": data.Mental_Health_Score,
-                "Relationship_Status": data.Relationship_Status,
-                "Conflicts_Over_Social_Media": data.Conflicts_Over_Social_Media,
-            }
-        ]
-    )
+    logger.info("Prediction request received.")
 
-    print("Original:", type(student_data))
-    print(student_data)
+    payload = data.model_dump() if hasattr(data, "model_dump") else data.dict()
 
-    # Access the fitted pipeline
-    # pipeline = model.regressor_
+    try:
+        prediction = predict_output(payload)
 
-    # x1 = pipeline.named_steps["Outliers Treatment"].transform(student_data)
-    # print("After Outliers Treatment:", type(x1))
-    # if hasattr(x1, "columns"):
-    #     print(x1.columns)
+        logger.info(f"Prediction successful. Raw prediction: {prediction:.4f}")
 
-    # x2 = pipeline.named_steps["Feature Engineering"].transform(x1)
-    # print("After Feature Engineering:", type(x2))
+        return build_prediction_response(
+            raw_prediction=prediction,
+            model_version=MODEL_VERSION,
+        )
 
-    prediction = model.predict(student_data)[0]
-    percent = (prediction - 2) / 7 * 100
+    except Exception as e:
+        logger.exception("Prediction failed.")
 
-    return JSONResponse(status_code=200, content={"The prediction is": percent})
+        raise HTTPException(status_code=500, detail="Internal Server Error") from e

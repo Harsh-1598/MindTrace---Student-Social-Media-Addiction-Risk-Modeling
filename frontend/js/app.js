@@ -249,6 +249,33 @@
     setText(query("#prediction-model"), healthInfo?.version || "Available via /health");
   };
 
+  const renderPlatformOptions = (platforms) => {
+    const platformSelect = query("#platform-select");
+
+    if (!platformSelect || !Array.isArray(platforms) || !platforms.length) {
+      return;
+    }
+
+    const currentValue = platformSelect.value;
+    platformSelect.innerHTML = "";
+
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Select";
+    platformSelect.appendChild(placeholderOption);
+
+    platforms.forEach((platform) => {
+      const option = document.createElement("option");
+      option.value = platform;
+      option.textContent = platform;
+      platformSelect.appendChild(option);
+    });
+
+    if (platforms.includes(currentValue)) {
+      platformSelect.value = currentValue;
+    }
+  };
+
   const initializePredictorHealthHint = async () => {
     const sourceNode = query("#prediction-source");
     const modelNode = query("#prediction-model");
@@ -283,6 +310,14 @@
     initializePredictorHealthHint().then((health) => {
       cachedHealth = health;
     });
+
+    MindTraceAPI.fetchPlatforms()
+      .then((response) => {
+        renderPlatformOptions(response.platforms);
+      })
+      .catch(() => {
+        // Keep the HTML fallback options if the metadata endpoint is unavailable.
+      });
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();

@@ -104,6 +104,7 @@ const MindTraceAPI = (() => {
   };
 
   const fetchHealth = () => requestJson("/health", { method: "GET" });
+  const fetchPlatforms = () => requestJson("/metadata/platforms", { method: "GET" });
 
   const submitPrediction = async (formData) => {
     const requestBody = buildPredictionPayload(formData);
@@ -129,6 +130,7 @@ const MindTraceAPI = (() => {
     buildPredictionPayload,
     buildRiskMessage,
     fetchHealth,
+    fetchPlatforms,
     normalizePredictionScore,
     submitPrediction,
   };
