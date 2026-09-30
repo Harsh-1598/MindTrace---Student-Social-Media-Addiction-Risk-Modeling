@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from config.most_used_platform import get_most_used_platforms
 from model.predict import MODEL_VERSION, model, predict_output
@@ -8,6 +12,7 @@ from schema.user_input import Student_info
 import logging
 
 app = FastAPI()
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,9 +26,9 @@ logger = logging.getLogger(__name__)
 
 
 # Human readable
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def hello():
-    return {"message": "Students Social Media Addiction API"}
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 # Machine readable
@@ -58,3 +63,6 @@ def predict_addiction_score(data: Student_info):
         logger.exception("Prediction failed.")
 
         raise HTTPException(status_code=500, detail="Internal Server Error") from e
+
+
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
